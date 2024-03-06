@@ -72,6 +72,16 @@ class ProductServiceTests {
         Assertions.assertNotNull(productService.findById(loadedProduct.getId()).orElse(null));
     }
 
-    // Write your tests below
+    @Test
+    void shouldDeleteProduct() {
+        Product product = createTestProduct("product2", 1.3, 5);
+        Product savedProduct = productService.save(product);
+        Product loadedProduct = productService.findById(savedProduct.getId()).orElse(null);
+        Assertions.assertNotNull(loadedProduct);
+
+        productService.deleteById(loadedProduct.getId());
+
+        Assertions.assertTrue(productService.findById(product.getId()).isEmpty());
+    }
 
 }

@@ -30,12 +30,37 @@ public class ProductService {
     }
 
     public Collection<Product> getAllProduct() {
-        ProductFilter filter = new ProductFilter(null);
+        Set<String> recalledProductsStringSet = recalledProductRepository.findAll().stream()
+                .map(RecalledProduct::getName)
+                .collect(Collectors.toSet());
+        ProductFilter filter = new ProductFilter(recalledProductsStringSet);
 
         return filter.removeRecalledFrom(inventoryRepository.findAll());
     }
 
+    // Move the filtering logic to the query instead of filtering in Java
+    public Collection<Product> getAllProduct2() {
+        return inventoryRepository.getNotRecalledProducts();
+    }
+
     public Optional<Product> findById(Integer id) {
         return inventoryRepository.findById(id);
+    }
+
+    public Product deleteById(Integer id) {
+        var deleted = inventoryRepository.findById(id);
+        if (deleted.isEmpty()) {
+            throw new IllegalArgumentException(String.format("Product %s not found", id));
+        }
+        inventoryRepository.deleteById(id);
+        return deleted.get();
+    }
+
+    public Product update(Product product) {
+        if (!inventoryRepository.existsById(product.getId())) {
+            throw new IllegalArgumentException(String.format("Product %s not found", product.getId()));
+        }
+        inventoryRepository.save(product);
+        return product;
     }
 }

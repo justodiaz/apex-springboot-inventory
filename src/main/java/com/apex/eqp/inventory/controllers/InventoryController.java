@@ -5,12 +5,8 @@ import com.apex.eqp.inventory.entities.RecalledProduct;
 import com.apex.eqp.inventory.services.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
 import java.util.Optional;
@@ -28,11 +24,11 @@ public class InventoryController {
      */
     @GetMapping
     public ResponseEntity<Collection<Product>> getAllProducts() {
-        return ResponseEntity.ok(productService.getAllProduct());
+        return ResponseEntity.ok(productService.getAllProduct2());
     }
 
     @PostMapping
-    public ResponseEntity<Product> createProduct(@RequestBody Product product) {
+    public ResponseEntity<Product> createProduct(@RequestBody @Validated Product product) {
         return ResponseEntity.ok(productService.save(product));
     }
 
@@ -41,5 +37,15 @@ public class InventoryController {
         Optional<Product> byId = productService.findById(id);
 
         return byId.map(ResponseEntity::ok).orElse(null);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Product> deleteProduct(@PathVariable Integer id) {
+        return ResponseEntity.ok(productService.deleteById(id));
+    }
+
+    @PatchMapping
+    public ResponseEntity<Product> updateProduct(@RequestBody @Validated Product product) {
+        return ResponseEntity.ok(productService.update(product));
     }
 }
